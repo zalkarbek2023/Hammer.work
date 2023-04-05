@@ -36,15 +36,11 @@ let json = """
 struct OrderTypeModel: Codable {
     let img: String
     let orderLabel: String
-    
-    
-    
+
 }
 
 struct OrderModel: Codable {
     
     var modelOrder: [OrderTypeModel]
-    
-    
     
 }

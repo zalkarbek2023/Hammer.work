@@ -10,7 +10,6 @@ import RxSwift
 
 class MainViewController: UIViewController {
 
-    @IBOutlet private weak var orderMethodCollectionView: UICollectionView!
     @IBOutlet private weak var orderTypeCollectionView: UICollectionView!
     @IBOutlet private weak var takeawaysTableview: UITableView!
     
@@ -18,13 +17,6 @@ class MainViewController: UIViewController {
     private let disposeBag = DisposeBag()
     private var products: Observable<[ProductModel]>?
     
-    
-    private var orderMethodArray = [
-        OrderMethodModel(name: "Delivery", img: UIImage(systemName: "car")!, isSelected: false),
-        OrderMethodModel(name: "Pickup", img: UIImage(systemName: "shippingbox")!, isSelected: false),
-        OrderMethodModel(name: "Catering", img: UIImage(systemName: "fork.knife")!, isSelected: false),
-        OrderMethodModel(name: "Curbside", img: UIImage(systemName: "rectangle.roundedtop")!, isSelected: false)
-    ]
     
     private var orderTypeArray = [OrderTypeModel]()
     private var takeAways = [ProductModel]() {
@@ -55,31 +47,14 @@ extension MainViewController: UICollectionViewDataSource {
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-        if collectionView == orderMethodCollectionView {
-            return orderMethodArray.count
-        } else {
             return orderTypeArray.count
-        }
     }
     
     func collectionView(
         _ collectionView: UICollectionView,
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
-        if collectionView == orderMethodCollectionView {
-            guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: OrderMethodCollectionViewCell.reuseID,
-                for: indexPath) as? OrderMethodCollectionViewCell else { fatalError() }
-            
-            let orderingMethod = orderMethodArray[indexPath.row]
-            cell.displayOrderMethod(orderingMethod)
-            if !orderMethodArray[indexPath.row].isSelected {
-                cell.backgroundColor = .white
-            } else {
-                cell.backgroundColor = .yellow
-            }
-            return cell
-        } else {
+        
             guard let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: OrderTypeCollectionViewCell.reuseID,
                 for: indexPath) as? OrderTypeCollectionViewCell else { fatalError() }
@@ -87,8 +62,6 @@ extension MainViewController: UICollectionViewDataSource {
             let orderType = orderTypeArray[indexPath.row]
             cell.displayOrderType(orderType)
             return cell
-            
-        }
     }
 }
 
@@ -98,30 +71,17 @@ extension MainViewController: UICollectionViewDelegateFlowLayout {
         layout collectionViewLayout: UICollectionViewLayout,
         sizeForItemAt indexPath: IndexPath
     ) -> CGSize {
-        if collectionView == orderMethodCollectionView {
-            return CGSize(width: 105, height: 40)
-        } else {
+        
             return CGSize(width: 100, height: 115)
-        }
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if collectionView == orderMethodCollectionView {
-            if !orderMethodArray[indexPath.row].isSelected {
-                for item in 0..<orderMethodArray.count {
-                    orderMethodArray[item].isSelected = false
-                }
-                orderMethodArray[indexPath.row].isSelected = true
-                orderMethodCollectionView.reloadData()
-            } else {
-                orderMethodArray[indexPath.row].isSelected = false
-                orderMethodCollectionView.reloadData()
-            }
-        } else {
+        
            configureCategoryArrays(indexPath: indexPath)
            takeawaysTableview.reloadData()
             
-        }
+        
     }
 }
 
@@ -173,11 +133,6 @@ extension MainViewController {
         }
     
     private func configureData() {
-        orderMethodCollectionView.dataSource = self
-        orderMethodCollectionView.delegate = self
-        orderMethodCollectionView.register(
-            UINib(nibName: String(describing: OrderMethodCollectionViewCell.self), bundle: nil),
-            forCellWithReuseIdentifier: OrderMethodCollectionViewCell.reuseID)
         
         orderTypeCollectionView.dataSource = self
         orderTypeCollectionView.delegate = self

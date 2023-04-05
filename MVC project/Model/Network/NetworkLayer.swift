@@ -8,6 +8,7 @@
 import UIKit
 import Foundation
 import RxSwift
+import Alamofire
 
 final class NetworkLayer {
     
@@ -31,9 +32,9 @@ final class NetworkLayer {
         
     }
         
-    func decodeData<T: Decodable>(data: Data) async -> T {
+    func decodeData<T: Decodable>(data: Data) async throws -> T {
         let decoder = JSONDecoder()
-        return try! decoder.decode(T.self, from: data)
+        return try decoder.decode(T.self, from: data)
     }
     
 //         find async await
@@ -60,52 +61,7 @@ final class NetworkLayer {
         
     }
     
-    
-    func findProductsData(text: String) async throws -> MainProductModel {
-        let urlQueryItem = URLQueryItem(name: "q", value: text)
-        let request = URLRequest(url: baseURL.appendingPathComponent("search").appending(queryItems: [urlQueryItem]))
-
-        let (data, _) = try await URLSession.shared.data(for: request)
-        return await decodeData(data: data)
-    }
-    
-    
-//     POST ASYNC AWAIT
-    
-    func postProductsData(model: ProductModel) async throws -> ProductModel {
-
-        var encodedProductModel: Data?
-        encodedProductModel = initializeData(product: encodedProductModel)
-
-        var request = URLRequest(url: baseURL)
-        request.httpMethod = "POST"
-        request.httpBody = encodedProductModel
-
-        let (data, _) = try await URLSession.shared.data(for: request)
-        return await decodeData(data: data)
-
-    }
-
-    
-//                            PUT TO ASYNC AWAIT
-    func putProductsData(model: ProductModel, id: Int) async throws -> ProductModel {
-        
-        var encodedProductModel: Data?
-        encodedProductModel = initializeData(product: encodedProductModel)
-        
-        var request = URLRequest(url: baseURL.appendingPathComponent("\(id)"))
-            request.httpMethod = "PUT"
-            request.httpBody = encodedProductModel
-        
-        let (data, _) = try await URLSession.shared.data(for: request)
-        return await decodeData(data: data)
-    }
-    
-    
-    
-//                      delete to async await
-    
-    
+//                        delete to async await
     
     func deleteProductsData(id: Int) async throws -> ProductModel {
         
@@ -113,11 +69,8 @@ final class NetworkLayer {
             request.httpMethod = "DELETE"
         
         let (data, _) = try await URLSession.shared.data(for: request)
-        return await decodeData(data: data)
+        return try await decodeData(data: data)
     }
-    
-    
-    
     
     
     func decodeData<T: Decodable>(data: Data, completion: @escaping (Result<T, Error>) -> Void) {
